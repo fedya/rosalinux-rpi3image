@@ -59,9 +59,9 @@ def make_chroot(release, arch):
     subprocess.check_output(['/usr/bin/sudo', 'rpm', '-Uvh', '--ignorearch', '--nodeps', repo_pkg, '--root', rootfs_dir])
     subprocess.check_output(['/usr/bin/sudo', 'dnf', '-y', 'install', '--nogpgcheck', '--installroot=' + rootfs_dir, '--releasever=' + release, '--forcearch=' + arch] + pkgs.split())
     # umount tmpfs first
-#    umount_tmpfs = subprocess.check_output(['/usr/bin/sudo', 'umount', rootfs_dir + '/var/cache/dnf'])
-#    umount_boot = subprocess.check_output(['/usr/bin/sudo', 'umount', boot_dir])
-#    umount_root = subprocess.check_output(['/usr/bin/sudo', 'umount', rootfs_dir])
+    umount_tmpfs = subprocess.check_output(['/usr/bin/sudo', 'umount', rootfs_dir + '/var/cache/dnf'])
+    umount_boot = subprocess.check_output(['/usr/bin/sudo', 'umount', boot_dir])
+    umount_root = subprocess.check_output(['/usr/bin/sudo', 'umount', rootfs_dir])
 
 prepare_rpi_disk()
 make_chroot('2019.1', 'aarch64')

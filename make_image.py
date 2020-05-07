@@ -36,6 +36,10 @@ def prepare_rpi_disk():
     subprocess.check_output(['/usr/bin/sudo', '/bin/mkdir', boot_dir])
     print('mounting boot {} to {}'.format(lodevice + 'p1', boot_dir))
     mount_boot = subprocess.check_output(['/usr/bin/sudo', 'mount', lodevice.strip() + 'p1', boot_dir])
+    # mount cache dir
+    print('mounting cache to {}'.format(rootfs_dir + '/var/cache/dnf'))
+    mkdir_tmpfs = subprocess.check_output(['/usr/bin/sudo', '/bin/mkdir', '-p', rootfs_dir + '/var/cache/dnf'])
+    mkdir_tmpfs = subprocess.check_output(['/usr/bin/sudo', 'mount', '-t', 'tmpfs', 'none', rootfs_dir + '/var/cache/dnf'])
 
 
 def find_repos(release, arch):
@@ -55,6 +59,7 @@ def make_chroot(release, arch):
     print(rootfs_dir)
     subprocess.check_output(['/usr/bin/sudo', 'rpm', '-Uvh', '--ignorearch', '--nodeps', repo_pkg, '--root', rootfs_dir])
     subprocess.check_output(['/usr/bin/sudo', 'dnf', '-y', 'install', '--nogpgcheck', '--installroot=' + rootfs_dir, '--releasever=' + release, '--forcearch=' + arch] + pkgs.split())
+    umount_tmpfs = subprocess.check_output(['/usr/bin/sudo', 'umount', rootfs_dir + '/var/cache/dnf'])
     umount_boot = subprocess.check_output(['/usr/bin/sudo', 'umount', boot_dir])
     umount_root = subprocess.check_output(['/usr/bin/sudo', 'umount', rootfs_dir])
 
