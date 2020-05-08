@@ -61,7 +61,7 @@ def make_chroot(release, arch):
     # copy fstab
     subprocess.check_output(['/usr/bin/sudo', 'cp', '-fv', 'fstab.template', rootfs_dir + '/etc/fstab'])
     # perl -e 'print crypt($ARGV[0], "password")' omv
-    subprocess.check_output(['/usr/bin/sudo', 'useradd', 'rosa', '-p', 'pabc4KTyGYBtg', '-G', 'wheel', '-m'])
+    # subprocess.check_output(['/usr/bin/sudo', 'useradd', 'rosa', '-p', 'pabc4KTyGYBtg', '-G', 'wheel', '-m'])
     # umount tmpfs first
     umount_tmpfs = subprocess.check_output(['/usr/bin/sudo', 'umount', rootfs_dir + '/var/cache/dnf'])
     # now umount /boot
