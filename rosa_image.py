@@ -54,15 +54,19 @@ def find_repos(release, arch):
 
 def make_chroot(release, arch):
     repo_pkg = find_repos(release, arch)
-    pkgs = 'NetworkManager less systemd-units openssh-server systemd psmisc gptfdisk timezone dnf sudo usbutils passwd kernel-rpi3 kernel-rpi3-modules locales-en basesystem-minimal'
+    pkgs = 'NetworkManager less systemd-units openssh-server systemd procps-ng timezone dnf sudo usbutils passwd kernel-rpi3 kernel-rpi3-modules locales-en basesystem-minimal rosa-repos-keys rosa-repos'
     print(rootfs_dir)
     subprocess.check_output(['/usr/bin/sudo', 'rpm', '-Uvh', '--ignorearch', '--nodeps', repo_pkg, '--root', rootfs_dir])
     subprocess.check_output(['/usr/bin/sudo', 'dnf', '-y', 'install', '--nogpgcheck', '--installroot=' + rootfs_dir, '--releasever=' + release, '--forcearch=' + arch] + pkgs.split())
     # copy fstab
     subprocess.check_output(['/usr/bin/sudo', 'cp', '-fv', 'fstab.template', rootfs_dir + '/etc/fstab'])
+    # perl -e 'print crypt($ARGV[0], "password")' omv
+    subprocess.check_output(['/usr/bin/sudo', 'useradd', 'rosa', '-p', 'pabc4KTyGYBtg', '-G', 'wheel', '-m'])
     # umount tmpfs first
     umount_tmpfs = subprocess.check_output(['/usr/bin/sudo', 'umount', rootfs_dir + '/var/cache/dnf'])
+    # now umount /boot
     umount_boot = subprocess.check_output(['/usr/bin/sudo', 'umount', boot_dir])
+    # and /
     umount_root = subprocess.check_output(['/usr/bin/sudo', 'umount', rootfs_dir])
 
 prepare_rpi_disk()
