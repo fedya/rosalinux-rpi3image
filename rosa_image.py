@@ -5,14 +5,14 @@ import sys
 import subprocess
 import requests
 
-rootfs_dir = '/tmp/rpi3_dir/'
-boot_dir = '/tmp/rpi3_dir/boot'
+rootfs_dir = '/tmp/rpi4_dir/'
+boot_dir = '/tmp/rpi4_dir/boot'
 
 def prepare_rpi_disk():
     disk_image = 'disk_image.img'
-    # dd if=/dev/zero of=rpi3_disk.img bs=1M count=1024
+    # dd if=/dev/zero of=rpi4_disk.img bs=1M count=1024
     print('creating {}'.format(disk_image))
-    make_disk = subprocess.check_output(['/usr/bin/sudo', 'dd', 'if=/dev/zero', 'of=disk_image.img', 'bs=1M', 'count=1256'])
+    make_disk = subprocess.check_output(['/usr/bin/sudo', 'dd', 'if=/dev/zero', 'of=disk_image.img', 'bs=1M', 'count=1700'])
     command = ['sudo', '/sbin/fdisk', disk_image]
     p = subprocess.Popen(command, stdin=subprocess.PIPE,
                          stdout=subprocess.PIPE,
@@ -54,10 +54,10 @@ def find_repos(release, arch):
 
 def make_chroot(release, arch):
     repo_pkg = find_repos(release, arch)
-    pkgs = 'NetworkManager less systemd-units openssh-server systemd procps-ng timezone dnf sudo usbutils passwd kernel-rpi3 kernel-rpi3-modules locales-en basesystem-minimal rosa-repos-keys rosa-repos'
+    pkgs = 'NetworkManager less systemd-units openssh-server systemd procps-ng timezone dnf sudo usbutils passwd kernel-rpi4 kernel-rpi4-modules locales-en basesystem-minimal rosa-repos-keys rosa-repos linux-firmware vim-enhanced e2fsprogs'
     print(rootfs_dir)
     subprocess.check_output(['/usr/bin/sudo', 'rpm', '-Uvh', '--ignorearch', '--nodeps', repo_pkg, '--root', rootfs_dir])
-    subprocess.check_output(['/usr/bin/sudo', 'dnf', '-y', 'install', '--nogpgcheck', '--installroot=' + rootfs_dir, '--releasever=' + release, '--forcearch=' + arch] + pkgs.split())
+    subprocess.check_output(['/usr/bin/sudo', 'dnf', '-y', 'install', '--setopt=install_weak_deps=False', '--nogpgcheck', '--installroot=' + rootfs_dir, '--releasever=' + release, '--forcearch=' + arch] + pkgs.split())
     # copy fstab
     subprocess.check_output(['/usr/bin/sudo', 'cp', '-fv', 'fstab.template', rootfs_dir + '/etc/fstab'])
     # perl -e 'print crypt($ARGV[0], "password")' omv

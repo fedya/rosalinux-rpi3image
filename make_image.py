@@ -55,7 +55,7 @@ def find_repos(release, arch):
 
 def make_chroot(release, arch):
     repo_pkg = find_repos(release, arch)
-    pkgs = 'NetworkManager less vim-enhanced systemd-console systemd-coredump systemd-cryptsetup systemd-analyze systemd-hwdb systemd-polkit systemd-boot psmisc gptfdisk timezone dnf sudo usbutils passwd kernel-rpi3 kernel-rpi3-modules locales-en'
+    pkgs = 'NetworkManager less vim-enhanced systemd-console systemd-coredump systemd-cryptsetup systemd-analyze systemd-hwdb systemd-polkit systemd-boot psmisc gptfdisk timezone dnf sudo usbutils passwd kernel-rpi3 kernel-rpi3-modules locales-en kernel-firmware'
     print(rootfs_dir)
     subprocess.check_output(['/usr/bin/sudo', 'rpm', '-Uvh', '--ignorearch', '--nodeps', repo_pkg, '--root', rootfs_dir])
     subprocess.check_output(['/usr/bin/sudo', 'dnf', '-y', 'install', '--nogpgcheck', '--installroot=' + rootfs_dir, '--releasever=' + release, '--forcearch=' + arch] + pkgs.split())
@@ -63,7 +63,7 @@ def make_chroot(release, arch):
     subprocess.check_output(['/usr/bin/sudo', 'cp', '-fv', 'fstab.template', rootfs_dir + '/etc/fstab'])
     # add password 'omv' with precreated hash
     # perl -e 'print crypt($ARGV[0], "password")' omv
-    # subprocess.check_output(['/usr/bin/sudo', 'useradd', 'omv', '-p', 'paknwSLF/t39I', '-G', 'wheel', '-m'])
+    subprocess.check_output(['/usr/bin/sudo', 'useradd', '--prefix', rootfs_dir, 'omv', '-p', 'paknwSLF/t39I', '-G', 'wheel', '-m'])
     umount_tmpfs = subprocess.check_output(['/usr/bin/sudo', 'umount', rootfs_dir + '/var/cache/dnf'])
     umount_boot = subprocess.check_output(['/usr/bin/sudo', 'umount', boot_dir])
     umount_root = subprocess.check_output(['/usr/bin/sudo', 'umount', rootfs_dir])
